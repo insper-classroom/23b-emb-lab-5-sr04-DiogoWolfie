@@ -78,21 +78,21 @@ extern void vApplicationMallocFailedHook(void) {
 /************************************************************************/
 
 void echo_callback(void) {
-	printf("echo callback foi chamado");
+
 	if(pio_get(PIN_PIO_E, PIO_INPUT, PIN_PIO_MASK_E)){
 		RTT_init(8500, 0, 0);
-		printf("rtt iniciou\n");
+	
 	}else{
 		uint32_t tempo =  rtt_read_timer_value(RTT);
 		xQueueSendFromISR(xQueueOLED, (void *)&tempo, 10);
-		printf("rtt foi enviado\n");
+		
 	}
 }
 
 void but_callback(void){
 	
 	xSemaphoreGiveFromISR(xSemaphoreBut, 0);
-	printf("botão apertado\n");
+
 
 }
 
@@ -110,14 +110,12 @@ static void task_oled(void *pvParameters) {
 	for (;;)  {
 		
 		if(xSemaphoreTake(xSemaphoreBut, 1000)){
-			printf("dei início ao trig\n");
 			
 			TRIG_10();
-			printf("trig 10 foi chamado\n");
 		}
 		
 		if (xQueueReceive(xQueueOLED, &msg, (TickType_t) 0)) {
-			printf("recebi o valor do rtt\n");
+
 			double som = 340;
 			double distancia = msg*som/2;
 			sprintf(str, "%d", distancia);
@@ -126,7 +124,6 @@ static void task_oled(void *pvParameters) {
 			
 			}else{
 			gfx_mono_draw_string("nao chegou", 0, 20, &sysfont);
-			printf("não funcionou o rtt\n");
 			
 		}
 
@@ -257,7 +254,7 @@ int main(void) {
 		printf("Failed to create oled task\r\n");
 	}
 	
-	printf("iniciei\n");
+
 	P_TRIG_INIT();
 	P_ECHO_INIT();
 	BUT_init();
